@@ -43,6 +43,7 @@ builds.
 | 65C350LE (Toshiba-branded) | ? | ? | U09.09 | V0000.09.09H.P0930 | not-exposed-over-SSDP (dd.xml stub on :3366 carrying only friendlyName/manufacturer/modelName; pairing handled by Sidee, profile 'modern', brand 'tos') | ? | untested | untested | [@VaheSaroyan](https://github.com/VaheSaroyan) |
 | 50U7DSE (internal 50U73SEVS_01, serial type 50U7SE) | EU_A (DEU) | MTK9618 (mt16587/mt5879; aarch64 kernel, armhf userland) | U09.62 | V0000.09.62N.Q0923 | 3290 | Chromium 111 "odin" (multi-shell UA: Weblayer/1.2.1, WebNavigator/6.1.10; aarch64) | working | achieved | [@roelven](https://github.com/roelven) |
 | VS1165UD1_0400 (Toshiba/Vestel; retail model unconfirmed) | EU_A (DevKit platform MT9602_EU_A; country unconfirmed) | MTK9602 (MT9602_EU_A; armv7l) | U06.10 | V0000.06.10S.N1222 | 2140 | Chromium 88 (armv7l) | untested | untested | [@PureBreadBagel](https://github.com/PureBreadBagel) |
+| 65A85QEVS | EU_A (Czech Republic) | MTK9618 (aarch64 kernel, 32-bit ARM userland) | U09.60 | V0000.09.60A.Q0602 | untested (SSDP silent; 36669/7000 only) | odin resources present; UA not recorded | working | achieved | [@LastThylacine](https://github.com/LastThylacine) |
 <!-- INVENTORY:END -->
 
 ## What each token means on each unit
@@ -147,6 +148,12 @@ never hand-edit between the markers.
 - `pairing` **working** — Python vidaa-control successfully completed RemoteNow MQTT PIN pairing; TV control broker reachable on TCP 36669. End-to-end custom launcher not tested.
 - `file_bridge_traversal` **closed** — WebSDK_createFileRequest fileRead of ../proc/version returned an empty string from ordinary HTTP and again through a vidaahub.com DNS-mapped HTTP origin; tested with modes 3 and 0. alvidaa recon v8 returned empty response from WebSDK_createFileRequest for file reads. No successful traversal observed in these tests; whether the cause is an origin gate, path restriction or other interface behaviour is unconfirmed.
 - `root` **untested** — No root method executed. Browser file access attempt failed in tested context; IPK prerequisite tests were only run in the normal browser, not an authorised application context. Root remains untested.
+**65A85QEVS — V0000.09.60A.Q0602**
+- `pairing` **untested** — Not exercised: no client cert on the host. The chain needs no pairing.
+- `file_bridge_traversal` **open** — hiutils.fileRead traverses with a one-element array path (../proc/uptime -> ret:true); bare strings are rejected. Read-only probe.
+- `file_bridge_write` **closed** — Browser fileWrite (HiUtils_createRequest) returns 503 'client request permission check error, please check appconfig'; WebSDK_createFileRequest does not exist on this build. The working write primitive is the FaaS fetcher (basic/fetcher fetchFile, uid 314).
+- `identity_gate` **gated** — The 503 appconfig rejection on browser fileWrite; the fetcher route is not gated the same way.
+- `root` **achieved** — fetchFile wrote sw2.js + installer.ipk; superwatch 83/82 installed re.installer (Architecture: mtk9618); postinst ran uid 0 and started the Node root shell on :8008. fetchFile cannot create directories, so the PFM payload is planted by the postinst, not by the fetcher.
 <!-- INVENTORY_DETAIL:END -->
 
 ## Community reports awaiting details
